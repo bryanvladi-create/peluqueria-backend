@@ -1,7 +1,5 @@
 import { Router } from 'express';
-import {
-  getPublicPromotions, getAllPromotionsAdmin, createPromotion, updatePromotion, deletePromotion
-} from '../controllers/promotions.controller';
+import { getPublicPromotions, getAllPromotionsAdmin, createPromotion, updatePromotion, deletePromotion } from '../controllers/promotions.controller';
 import { verifyToken } from '../middlewares/auth.middleware';
 import { upload } from '../middlewares/upload.middleware';
 

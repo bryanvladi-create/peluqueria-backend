@@ -1,17 +1,11 @@
 import { Router } from 'express';
-import {
-  getPublicServices, getAllServicesAdmin, createService, updateService, deleteService,
-  addServiceImages, deleteServiceImage
-} from '../controllers/services.controller';
+import { getPublicServices, getAllServicesAdmin, createService, updateService, deleteService, addServiceImages, deleteServiceImage } from '../controllers/services.controller';
 import { verifyToken } from '../middlewares/auth.middleware';
 import { upload } from '../middlewares/upload.middleware';
 
 const router = Router();
 
-// Rutas Públicas (Landing Page)
 router.get('/public', getPublicServices);
-
-// Rutas Privadas (Panel de Administración) - Requieren Token JWT
 router.get('/admin', verifyToken, getAllServicesAdmin);
 router.post('/', verifyToken, createService);
 router.post('/:id/images', verifyToken, upload.array('images', 10), addServiceImages);

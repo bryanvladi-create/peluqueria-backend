@@ -5,8 +5,7 @@ import { upload } from '../middlewares/upload.middleware';
 
 const router = Router();
 
-router.get('/', getGallery); // Público
-// Ruta protegida: subida de varias imágenes con nombre de campo 'images'
+router.get('/', getGallery);
 router.post('/', verifyToken, upload.array('images', 20), uploadImages);
 router.delete('/:id', verifyToken, deleteImage);
 
