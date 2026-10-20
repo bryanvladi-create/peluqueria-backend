@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { pool } from '../config/db';
 
-// GET /api/stats (admin): conteos para las tarjetas del dashboard
 export const getStats = async (_req: Request, res: Response) => {
   try {
     const result = await pool.query(`
@@ -12,6 +11,7 @@ export const getStats = async (_req: Request, res: Response) => {
         (SELECT COUNT(*) FILTER (WHERE is_active)     FROM promotions)::int    AS promotions_active,
         (SELECT COUNT(*) FILTER (WHERE NOT is_active) FROM promotions)::int    AS promotions_inactive,
         (SELECT COUNT(*) FILTER (WHERE is_active)     FROM testimonials)::int  AS testimonials_active,
+        (SELECT COUNT(*) FILTER (WHERE status = 'pending') FROM appointments)::int AS appointments_pending,
         (SELECT show_testimonials FROM site_settings LIMIT 1)                  AS testimonials_section_on
     `);
     res.json(result.rows[0]);

@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { pool } from '../config/db';
 import { emptyToNull, isUuid } from '../utils/helpers';
+import { sendAppointmentNotifications } from '../services/notification.service';
 
 // Público: Crear una nueva cita
 export const createAppointment = async (req: Request, res: Response) => {
@@ -24,7 +25,27 @@ export const createAppointment = async (req: Request, res: Response) => {
         emptyToNull(notes)
       ]
     );
-    res.status(201).json({ message: 'Cita agendada correctamente', appointment: result.rows[0] });
+    
+    const appointment = result.rows[0];
+
+    // Buscamos el nombre del servicio para el mensaje de notificación
+    let serviceName: string | undefined = undefined;
+    if (appointment.service_id) {
+      const svc = await pool.query('SELECT name FROM services WHERE id = $1', [appointment.service_id]);
+      if (svc.rowCount && svc.rowCount > 0) serviceName = svc.rows[0].name;
+    }
+
+    // Disparamos las notificaciones (Correo / WhatsApp)
+    sendAppointmentNotifications({
+      client_name: appointment.client_name,
+      client_phone: appointment.client_phone,
+      appointment_date: appointment.appointment_date,
+      appointment_time: appointment.appointment_time,
+      service_name: serviceName,
+      notes: appointment.notes
+    });
+
+    res.status(201).json({ message: 'Cita agendada correctamente', appointment });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error interno al agendar la cita' });
@@ -34,7 +55,6 @@ export const createAppointment = async (req: Request, res: Response) => {
 // Admin: Ver todas las citas
 export const getAllAppointments = async (_req: Request, res: Response) => {
   try {
-    // Hacemos un JOIN para traer el nombre del servicio si es que tiene uno asignado
     const result = await pool.query(`
       SELECT a.*, s.name as service_name 
       FROM appointments a
@@ -48,7 +68,7 @@ export const getAllAppointments = async (_req: Request, res: Response) => {
   }
 };
 
-// Admin: Actualizar estado (pendiente, confirmada, cancelada, completada)
+// Admin: Actualizar estado
 export const updateAppointmentStatus = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { status } = req.body;
