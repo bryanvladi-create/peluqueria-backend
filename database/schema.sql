@@ -93,3 +93,31 @@ CREATE TABLE IF NOT EXISTS testimonials (
   is_active   BOOLEAN      NOT NULL DEFAULT TRUE,
   created_at  TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- ... (tus tablas anteriores: admins, site_settings, services, etc.) ...
+
+-- Testimonios (reseñas cargadas a mano o copiadas de Google Maps)
+CREATE TABLE IF NOT EXISTS testimonials (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_name VARCHAR(120) NOT NULL,
+  review_text TEXT         NOT NULL,
+  rating      SMALLINT     NOT NULL DEFAULT 5 CHECK (rating BETWEEN 1 AND 5),
+  is_active   BOOLEAN      NOT NULL DEFAULT TRUE,
+  created_at  TIMESTAMPTZ  NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 👇 NUEVA TABLA PARA EL SISTEMA DE CITAS (PLAN PRO) 👇
+CREATE TABLE IF NOT EXISTS appointments (
+  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_name      VARCHAR(120) NOT NULL,
+  client_phone     VARCHAR(30)  NOT NULL,
+  client_email     VARCHAR(160),
+  service_id       UUID REFERENCES services(id) ON DELETE SET NULL,
+  appointment_date DATE NOT NULL,
+  appointment_time TIME NOT NULL,
+  status           VARCHAR(20) NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'confirmed', 'cancelled', 'completed')),
+  notes            TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments (appointment_date, appointment_time);

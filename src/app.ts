@@ -10,6 +10,7 @@ import galleryRoutes from './routes/gallery.routes';
 import promotionsRoutes from './routes/promotions.routes';
 import testimonialsRoutes from './routes/testimonials.routes';
 import statsRoutes from './routes/stats.routes';
+import appointmentsRoutes from './routes/appointments.routes';
 
 const app = express();
 
@@ -39,7 +40,9 @@ app.use('/api/services', servicesRoutes);
 app.use('/api/gallery', galleryRoutes);
 app.use('/api/promotions', promotionsRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
+app.use('/api/appointments', appointmentsRoutes);
 app.use('/api/stats', statsRoutes);
+
 
 // Errores
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
