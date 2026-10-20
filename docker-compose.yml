@@ -1,0 +1,16 @@
+# Base de datos PostgreSQL local (opcional). Coincide con .env.example:
+#   docker compose up -d   →   luego: npm run seed
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: cambia_esta_clave
+      POSTGRES_DB: peluqueria
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
